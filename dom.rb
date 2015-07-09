@@ -31,13 +31,13 @@ class Parser
     
     t=Tag.new
     t.name = text.scan(/^<\w*/)[0][1..-1]
-    puts "Name of a tag is #{t.name}"
+    # puts "Name of a tag is #{t.name}"
     
     #Takes attribute tag and value
     
     attributes = text.scan(/\w+=.+"/)[0].split("=")
 
-    puts "attributes are #{attributes}"
+    # puts "attributes are #{attributes}"
     case attributes[0]
       when "class"
         t.class=attributes[1]
@@ -47,11 +47,11 @@ class Parser
         t.name_attr=attributes[1]
     end
       
-    puts "Class is #{t.class}"
+    # puts "Class is #{t.class}"
 
     #Collects the data in a div
     t.data = text.scan(/>.*?</)[1..-2]
-    puts "Data is #{t.data}"
+    # puts "Data is #{t.data}"
     # regex = /\w+=/
     # puts text.scan(regex)[0][0..-2]
 
