@@ -17,6 +17,17 @@ class Parser
 
   end
 
+  # text == array
+
+  # while i<array.size
+  #   text[i] == scan(/^<\w*/)
+  #   name= scan(/^<\w*/)
+  #   closing_name="</"+name+">"
+  #   until text[i]==closing_name
+  #     return text[i_staring..i_match]
+  #   end
+
+
   def parse
 
 
