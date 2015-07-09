@@ -15,6 +15,8 @@ class Parser
     @file = file
 
 
+
+
   end
 
   # text == array
@@ -38,7 +40,9 @@ class Parser
     
     #Takes attribute tag and value
     
-    attributes = text.scan(/\w+=[^ >]+/)[0].split("=")
+    attributes = text.scan(/\w+=.+"/)[0].split("=")
+
+    puts "attributes are #{attributes}"
     case attributes[0]
       when "class"
         t.class=attributes[1]
@@ -51,7 +55,7 @@ class Parser
     puts "Class is #{t.class}"
 
     #Collects the data in a div
-    t.data = text.scan(/>.*?</)[0][1..-2]
+    t.data = text.scan(/>.*?</)[1..-2]
     puts "Data is #{t.data}"
     # regex = /\w+=/
     # puts text.scan(regex)[0][0..-2]
@@ -62,6 +66,6 @@ class Parser
 
 end
 
-parser = Parser.new(@file[10..12].join)
+parser = Parser.new(test.join)
 
-parser.parse
+parser.parse_tag('<li class="bold funky important">One unordered list</li>')
