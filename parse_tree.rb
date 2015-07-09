@@ -5,51 +5,79 @@ Tag = Struct.new(:name, :class, :id, :name_attr, :data, :parent, :children)
 
 class ParseTree
 
-  attr_reader :start
+  attr_reader  :root
 
-  # def initialize(file)
+  def initialize(file)
 
-  #   @all_tags=["html","head","title","body","div","main","header","span","h1","h2","ul","li"]
+    @all_tags=["html","head","title","body","div","main","header","span","h1","h2","ul","li"]
 
-  #   @root = Tag.new("<!doctype html>", nil, nil, nil, file , nil,[])
+    @root = Tag.new("<!doctype html>", nil, nil, nil, file , nil,[])
 
-  #   queue = [@root]
+  end
 
-  #   current_square = @root
 
-  #   until queue.empty?
-  #     build_children(current_square)
-  #     queue += current_square.children
-  #     current_square = queue.shift
-  #   end
-  # end
+  def build_tree
+    queue = [@root]
+
+    
+    
+    until queue.empty?
+      current_square = queue.shift
+      build_children(current_square)
+      queue += current_square.children
+      
+      puts "For parent #{current_square.name}"
+      current_square.children.each do |kid|
+        puts "Kids name #{kid.name}"
+      end
+      queue.each do |tag|
+        puts "QUEUE -------- Tags name #{tag.name}"
+      end
+      
+
+
+    end
+  end
 
   def build_children(current_square)
 
     arr=current_square.data
-    puts arr.inspect
-    i=1
-    puts "start build child"
+    #puts arr.inspect
+    i=0
+    puts "Beggining build a child"
     until arr[i].nil? 
-      #"html"
-      # t.name = text.scan(/^<\w*/)[0][1..-1]
-      puts "arr[i] is #{arr[i]}"
-      tag_name = arr[i].scan(/^<\w*/)[0][1..-1]
-      puts "tag name is #{tag_name.inspect}"
+      
+      #puts "arr[i] is #{arr[i]}"
+      if arr[i].scan(/^<\w*/).empty? 
+        i+=1
+        next 
+      else
+        tag_name = arr[i].scan(/^<\w*/)[0][1..-1]
+      end
+
+      #puts "tag name is #{tag_name.inspect}"
       # next if tag_name.empty?
       open_index=i
       @all_tags.include? tag_name
       closing_tag = "</#{tag_name}>"
-      puts "closing tag is #{closing_tag}"
-      until arr[i].nil? || arr[i].include?(closing_tag)
+      #puts "closing tag is #{closing_tag}"
+      
+      
+      #puts arr[i].class
+      until arr[i].to_s.empty? || arr[i].include?(closing_tag)
         i+=1
       end
 
-      child = Tag.new
-      child.data= arr[open_index+1..i-1]
-      puts "child data is #{child.data}"
+      unless tag_name == "-"
+
+      child = Tag.new(tag_name, nil, nil, nil, arr[open_index+1..i-1], current_square, [])
+
+      
+      puts "child name is #{child.name} with data is #{child.data}"
       current_square.children << child 
-      puts "added a child"
+
+      #puts "added a child"
+      end
       i += 1
     end
   end
@@ -57,10 +85,10 @@ class ParseTree
 end
 
 
-file = Loader.new
-html = ParseTree.new #(load.load)
+file = Loader.new.load
+html = ParseTree.new(file)
 
-html.build_children(Tag.new("<!doctype html>", nil, nil, nil, file , nil,[]))
-
+#html.build_children(html.root)
+html.build_tree
 
 
