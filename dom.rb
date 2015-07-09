@@ -11,12 +11,7 @@ test = load.load
 class Parser
 
   def initialize(file)
-
     @file = file
-
-
-
-
   end
 
   # text == array
