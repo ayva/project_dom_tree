@@ -28,21 +28,17 @@ class Parser
   #   end
 
 
-  def parse
+  def parse_tag(text) 
 
-
-    text =  @file[10..12].join
-    puts text
     #This takes tag name like "div"
-    regex = /^<\w*/
+    
     t=Tag.new
-    t.name = text.scan(regex)[0][1..-1]
+    t.name = text.scan(/^<\w*/)[0][1..-1]
     puts "Name of a tag is #{t.name}"
-    #<div class="inner-div">I'm an inner div!!!</div>
+    
     #Takes attribute tag and value
-    regex = /\w+=[^ >]+/
-
-    attributes = text.scan(regex)[0].split("=")
+    
+    attributes = text.scan(/\w+=[^ >]+/)[0].split("=")
     case attributes[0]
       when "class"
         t.class=attributes[1]
@@ -54,22 +50,11 @@ class Parser
       
     puts "Class is #{t.class}"
 
-    
     #Collects the data in a div
-    regex = />.*?</
-    t.data = text.scan(regex)[0][1..-2]
+    t.data = text.scan(/>.*?</)[0][1..-2]
     puts "Data is #{t.data}"
     # regex = /\w+=/
     # puts text.scan(regex)[0][0..-2]
-
-
-
-
-    
-
-
-
-
 
   end
 
@@ -77,6 +62,6 @@ class Parser
 
 end
 
-parser = Parser.new(test)
+parser = Parser.new(@file[10..12].join)
 
 parser.parse
