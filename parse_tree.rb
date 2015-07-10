@@ -49,6 +49,8 @@ class ParseTree
 
         tag_name = take_tag_name(arr[i])[1]
 
+        p tag_name
+
         classy = take_class(arr[i]) if has_class?(arr[i])
 
         id = take_id(arr[i]) if has_id?(arr[i])
@@ -117,9 +119,8 @@ class ParseTree
     regex = /<(\/?)(\w+)/
 
     scanned = string.scan(regex)[0]
-    p scanned
 
-    scanned.nil? ? false : scanned[0]
+    scanned.nil? ? false : scanned
 
   end
 
