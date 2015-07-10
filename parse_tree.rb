@@ -45,11 +45,15 @@ class ParseTree
     
     until arr[i].nil? 
 
-      if take_tag(arr[i]) && take_tag(arr[i])[0] == ""
-        tag_name = take_tag(arr[i])[1]
+      if take_tag_name(arr[i]) && take_tag_name(arr[i])[0] == ""
 
-        Parser.new(arr[i]).parse_tag(current_node)
-        puts "Class of a current node is #{current_node.class} -----"
+        tag_name = take_tag_name(arr[i])[1]
+
+        classy = take_class(arr[i]) if has_class?(arr[i])
+
+        id = take_id(arr[i]) if has_id?(arr[i])
+
+        name_attr = take_name_attr(arr[i]) if has_name_attr?(arr[i])
       else
         i+=1
         next
@@ -67,8 +71,10 @@ class ParseTree
       i = find_closing_tag(arr,open_index,tag_name)
       
       grab_text(open_index, i, current_node)
+
+
       
-      child = Tag.new(tag_name, nil, nil, nil, arr[open_index+1..i-1], current_node, [],[])
+      child = Tag.new(tag_name, classy, id, name_attr, arr[open_index+1..i-1], current_node, [],[])
       puts "child name is #{child.name}"
       current_node.children << child 
       
@@ -85,10 +91,10 @@ class ParseTree
     stack = [tag_name]
     i+=1    
     until stack.empty? || arr[i].nil?
-      if take_tag(arr[i])
-        #puts "take tag #{take_tag(arr[i])}"
-        if take_tag(arr[i])[1] == tag_name
-          if take_tag(arr[i])[0] == "/" 
+      if take_tag_name(arr[i])
+        #puts "take tag #{take_tag_name(arr[i])}"
+        if take_tag_name(arr[i])[1] == tag_name
+          if take_tag_name(arr[i])[0] == "/" 
             stack.pop
           else
             stack << tag_name
@@ -103,18 +109,70 @@ class ParseTree
     
   end
 
-  def take_tag(string)
+  def take_tag_name(string)
     #for open tag returns  [["", "html"]], for closing tag [["/", "html"]]
-    #puts "Scanned #{string.scan(/<(\/?)(\w+)>/)}"
-    scanned = string.scan(/<(\/?)(\w+)>/)
-     
-    #puts "====== #{string.scan(/<(\/?)(.+)>/)[0][1].split("class=")}"
-    #expected result [["", "html"]] or [["/", "html"]]
 
-    #string[1]=="/" ? scanned = string.scan(/<(\/)(.+)>/) : scanned = string.scan(/<(\/?)(.+)>/)
+    # old regex = /<(\/?)(\w+)>/
 
-    scanned.empty? ? false : scanned[0]
-    #for closing tag returns 2.2.1 :004 > "</html>".scan(/^<\w*/)=> ["<"]
+    regex = /<(\/?)(\w+)/
+
+    scanned = string.scan(regex)[0]
+    p scanned
+
+    scanned.nil? ? false : scanned[0]
+
+  end
+
+  def has_class?(string)
+    regex = /class="[^"]*"/
+
+    !!string.scan(regex)[0]
+  end
+
+  def take_class(string)
+
+    regex = /class="[^"]*"/
+
+    classy = string.scan(regex)[0]
+
+    classy.slice!("class=")
+
+    classy
+
+  end
+
+  def has_id?(string)
+    regex = /id="[^"]*"/
+    !!string.scan(regex)[0]
+  end
+
+  def take_id(string)
+
+    regex = /id="[^"]*"/
+
+    id = string.scan(regex)[0]
+
+    id.slice!("id=")
+
+    id
+
+  end
+
+  def has_name_attr?(string)
+    regex = /name="[^"]*"/
+    !!string.scan(regex)[0]
+  end
+
+  def take_name_attr(string)
+
+    regex = /name="[^"]*"/
+
+    name = string.scan(regex)[0]
+
+    name.slice!("name=")
+
+    name
+
   end
 
   def grab_text(open_index, close_index, current_node)
@@ -133,7 +191,7 @@ class ParseTree
     regex = />\w*</
 
     until open_index == close_index
-      if !take_tag(arr[open_index])
+      if !take_tag_name(arr[open_index])
         current_node.text << arr[open_index]
 
       elsif arr[open_index].scan(regex)[0].nil?
@@ -164,13 +222,13 @@ end
 file = Loader.new.load
 html = ParseTree.new(file)
 
-#html.build_children(html.root)
+html.build_children(html.root)
 #html.root.children.each {|kid| puts kid.name}
-html.build_tree
+# html.take_tag_name('</div class="class 2" id="id" name="name1 name2">')
 
 #NodeRender.new(html).render
 
-TreeSearcher.new(html).search_by(:name,"title")
+# TreeSearcher.new(html).search_by(:name,"title")
 
  #find_closing_tag(html.root.data,0,"head")
 
