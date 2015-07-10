@@ -55,28 +55,38 @@ class ParseTree
         tag_name = arr[i].scan(/^<\w*/)[0][1..-1]
       end
 
-      #puts "tag name is #{tag_name.inspect}"
+      puts "tag name is #{tag_name.inspect}"
       # next if tag_name.empty?
       open_index=i
       @all_tags.include? tag_name
       closing_tag = "</#{tag_name}>"
-      #puts "closing tag is #{closing_tag}"
+      puts "closing tag is #{closing_tag}"
       
-      
+      stack = [tag_name]
       #puts arr[i].class
-      until arr[i].to_s.empty? || arr[i].include?(closing_tag)
+      until arr[i].nil? || stack.empty?
+        p stack
+
+        # arr[i].to_s.empty? || arr[i].include?(closing_tag)
+        if arr[i].scan(/^<\w*/)
+          stack << arr[i] if arr[i] == "<#{tag_name}>"
+        elsif arr[i] == closing_tag
+          stack.pop
+        end
+
+        # puts i
         i+=1
       end
-
-      unless tag_name == "-"
+      puts "tag name #{tag_name}"
+      unless tag_name.empty?
 
       child = Tag.new(tag_name, nil, nil, nil, arr[open_index+1..i-1], current_square, [])
 
       
-      puts "child name is #{child.name} with data is #{child.data}"
+      puts "child name is #{child.name}"
       current_square.children << child 
 
-      #puts "added a child"
+      # puts "added a child"
       end
       i += 1
     end
