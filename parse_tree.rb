@@ -11,7 +11,7 @@ class ParseTree
 
     @all_tags=["html","head","title","body","div","main","header","span","h1","h2","ul","li"]
 
-    @root = Tag.new("<!doctype html>", nil, nil, nil, file , nil,[])
+    @root = Tag.new("<!doctype html>", nil, nil, nil, file , nil,[], [])
 
   end
 
@@ -57,6 +57,7 @@ class ParseTree
       open_index = i
       puts "Open tag index is #{i}"
       i = find_closing_tag(arr,open_index+1,tag_name)
+      grab_text(open_index, i, current_node)
       puts "Closing tag index is #{i}"
       child = Tag.new(tag_name, nil, nil, nil, arr[open_index+1..i-1], current_node, [])
       puts "child name is #{child.name}"
@@ -82,7 +83,6 @@ class ParseTree
             stack << tag_name
           end
         end
-        
       end
       i+=1
       return i-1 if stack.empty?
@@ -100,13 +100,32 @@ class ParseTree
     #for closing tag returns 2.2.1 :004 > "</html>".scan(/^<\w*/)=> ["<"]
   end
 
+  def grab_text(open_index, close_index, current_node)
+    current_node.text = []
+    arr = current_node.data
+    regex = />\w*</
+    p arr[open_index]
+    until open_index == close_index
+      if !take_tag(arr[open_index])
+        current_node.text << arr[open_index]
+
+      elsif arr[open_index].scan(regex)[0].nil?
+
+      elsif arr[open_index].scan(regex)[0][1..-2]
+        current_node.text << arr[open_index].scan(regex)[0][1..-2]
+      end
+      open_index += 1
+    end
+  end
+
+
 end
 
 
 file = Loader.new.load
 html = ParseTree.new(file)
 
-html.build_children(html.root)
+# html.build_children(html.root)
 #html.root.children.each {|kid| puts kid.name}
 html.build_tree
 

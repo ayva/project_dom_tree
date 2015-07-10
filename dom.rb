@@ -1,4 +1,4 @@
-Tag = Struct.new(:name, :class, :id, :name_attr, :data, :parent, :children)
+Tag = Struct.new(:name, :class, :id, :name_attr, :data, :parent, :children, :text)
 require './loader.rb'
 
 load = Loader.new
