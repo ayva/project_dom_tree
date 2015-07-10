@@ -112,8 +112,17 @@ class ParseTree
     #current_node.text = []
     arr = current_node.data
     #regex looking for text between tags <tag>Text</tag>
-    regex = />\w*</
+    regex = />.*</
+
+    if open_index == close_index && check_tag_sameline(arr, open_index)
+      p
+      current_node.text << arr[open_index].scan(regex)[0][1..-2]
+
+      puts "here"
+    end
     
+    regex = />\w*</
+
     until open_index == close_index
       if !take_tag(arr[open_index])
         current_node.text << arr[open_index]
@@ -125,6 +134,8 @@ class ParseTree
       end
       open_index += 1
     end
+
+
     puts "Tag #{current_node.name} text #{current_node.text }"
   end
 
