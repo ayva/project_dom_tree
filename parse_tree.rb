@@ -1,7 +1,7 @@
 require "./loader.rb"
 require "./dom.rb"
-
-
+require "./node_render.rb"
+require "./tree_searcher.rb"
 
 class ParseTree
 
@@ -47,6 +47,9 @@ class ParseTree
 
       if take_tag(arr[i]) && take_tag(arr[i])[0] == ""
         tag_name = take_tag(arr[i])[1]
+
+        Parser.new(arr[i]).parse_tag(current_node)
+        puts "Class of a current node is #{current_node.class} -----"
       else
         i+=1
         next
@@ -104,6 +107,12 @@ class ParseTree
     #for open tag returns  [["", "html"]], for closing tag [["/", "html"]]
     #puts "Scanned #{string.scan(/<(\/?)(\w+)>/)}"
     scanned = string.scan(/<(\/?)(\w+)>/)
+     
+    #puts "====== #{string.scan(/<(\/?)(.+)>/)[0][1].split("class=")}"
+    #expected result [["", "html"]] or [["/", "html"]]
+
+    #string[1]=="/" ? scanned = string.scan(/<(\/)(.+)>/) : scanned = string.scan(/<(\/?)(.+)>/)
+
     scanned.empty? ? false : scanned[0]
     #for closing tag returns 2.2.1 :004 > "</html>".scan(/^<\w*/)=> ["<"]
   end
@@ -158,6 +167,10 @@ html = ParseTree.new(file)
 #html.build_children(html.root)
 #html.root.children.each {|kid| puts kid.name}
 html.build_tree
+
+#NodeRender.new(html).render
+
+TreeSearcher.new(html).search_by(:name,"title")
 
  #find_closing_tag(html.root.data,0,"head")
 

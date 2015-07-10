@@ -17,32 +17,34 @@ class Parser
 
 
 
-  def parse_tag(text) 
+  def parse_tag (current_node)
 
     #This takes tag name like "div"
     
-    t=Tag.new
-    t.name = text.scan(/^<\w*/)[0][1..-1]
+    # t=Tag.new
+    # t.name = @file.scan(/^<\w*/)[0][1..-1]
     # puts "Name of a tag is #{t.name}"
     
     #Takes attribute tag and value
     
-    attributes = text.scan(/\w+=.+"/)[0].split("=")
+    if @file.include? ("=")
+    attributes = @file.scan(/\w+=.+"/).split("=")
 
     # puts "attributes are #{attributes}"
-    case attributes[0]
-      when "class"
-        t.class=attributes[1]
-      when "id"
-        t.id=attributes[1]
-      when "name"
-        t.name_attr=attributes[1]
+      case attributes[0]
+        when "class"
+          current_node.class=attributes[1]
+        when "id"
+          current_node.id=attributes[1]
+        when "name"
+          current_node.name_attr=attributes[1]
+      end
     end
       
     # puts "Class is #{t.class}"
 
     #Collects the data in a div
-    t.data = text.scan(/>.*?</)[1..-2]
+    #t.data = @file.scan(/>.*?</)[1..-2]
     # puts "Data is #{t.data}"
     # regex = /\w+=/
     # puts text.scan(regex)[0][0..-2]
@@ -53,6 +55,6 @@ class Parser
 
 end
 
-parser = Parser.new(test.join)
+# parser = Parser.new(test.join)
 
-parser.parse_tag('<li class="bold funky important">One unordered list</li>')
+# parser.parse_tag('<li class="bold funky important">One unordered list</li>')
