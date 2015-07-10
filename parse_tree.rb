@@ -26,7 +26,7 @@ class ParseTree
       build_children(current_node)
       queue += current_node.children
       queue.each do |tag|
-        puts "QUEUE ----tag----  #{tag.name}"
+        #puts "QUEUE ----tag----  #{tag.name}"
       end
       puts "PARENT #{current_node.name} !!!!"
       current_node.children.each do |kid|
@@ -55,24 +55,32 @@ class ParseTree
       raise "Oops, empty" if tag_name.empty?
 
       open_index = i
-      puts "Open tag index is #{i}"
-      i = find_closing_tag(arr,open_index+1,tag_name)
+      
+      if arr.length<2
+        puts "Only one line in array"
+        return
+      end
+
+      i = find_closing_tag(arr,open_index,tag_name)
+      
       grab_text(open_index, i, current_node)
-      puts "Closing tag index is #{i}"
-      child = Tag.new(tag_name, nil, nil, nil, arr[open_index+1..i-1], current_node, [])
+      
+      child = Tag.new(tag_name, nil, nil, nil, arr[open_index+1..i-1], current_node, [],[])
       puts "child name is #{child.name}"
       current_node.children << child 
       
       i += 1
-      puts "Index after child is #{i}"
-      puts "Statement check #{arr[i].nil?}"
+      
     end
 
   end
 
   def  find_closing_tag(arr,i,tag_name)
+
+    #Should return i if arr has only one element
+    return i if check_tag_sameline(arr,i)
     stack = [tag_name]
-        
+    i+=1    
     until stack.empty? || arr[i].nil?
       if take_tag(arr[i])
         #puts "take tag #{take_tag(arr[i])}"
@@ -101,10 +109,11 @@ class ParseTree
   end
 
   def grab_text(open_index, close_index, current_node)
-    current_node.text = []
+    #current_node.text = []
     arr = current_node.data
+    #regex looking for text between tags <tag>Text</tag>
     regex = />\w*</
-    p arr[open_index]
+    
     until open_index == close_index
       if !take_tag(arr[open_index])
         current_node.text << arr[open_index]
@@ -116,6 +125,16 @@ class ParseTree
       end
       open_index += 1
     end
+    puts "Tag #{current_node.name} text #{current_node.text }"
+  end
+
+  def check_tag_sameline(arr,i)
+    
+    #true if found tags in one line
+    #false if no 2 tag in one line
+
+    !arr[i].scan(/>.*</)[0].nil?
+
   end
 
 
@@ -125,7 +144,7 @@ end
 file = Loader.new.load
 html = ParseTree.new(file)
 
-# html.build_children(html.root)
+#html.build_children(html.root)
 #html.root.children.each {|kid| puts kid.name}
 html.build_tree
 
